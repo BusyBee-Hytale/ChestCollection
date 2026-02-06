@@ -9,6 +9,15 @@ commands:
     toggle:
       enabled: "ChestCollection is now Enabled"
       disabled: "ChestCollection is now Disabled"
+
+# ========================================
+#       Auto Pickup Messages
+# ========================================
+autopickup:
+  enabled: "Auto Pickup enabled! Items will be automatically collected when you break blocks."
+  disabled: "Auto Pickup disabled! Items will drop normally when you break blocks."
+  disabled-globally: "Auto Pickup is currently disabled on this server."
+  no-permission: "You don't have permission to use Auto Pickup!"
     
 ui:
   settings:

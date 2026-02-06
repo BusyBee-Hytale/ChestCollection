@@ -2,6 +2,12 @@ package com.busybee.chestcollector;
 
 import ai.kodari.hylib.commons.scheduler.Scheduler;
 import ai.kodari.hylib.config.YamlConfig;
+import com.busybee.autopickup.commands.AutoPickupCommand;
+import com.busybee.autopickup.listeners.AutoPickupListener;
+import com.busybee.autopickup.listeners.MobDropListener;
+import com.busybee.autopickup.manager.AutoPickupManager;
+import com.busybee.autopickup.system.DropInterceptorSystem;
+import com.busybee.autopickup.system.PlayerTrackingSystem;
 import com.busybee.chestcollector.commands.CollectorCommand;
 import com.busybee.chestcollector.data.CollectorData;
 import com.busybee.chestcollector.systems.ItemCollectionSystem;
@@ -23,6 +29,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
     private YamlConfig collectorsData;
 
     private Map<UUID, CollectorData> collectors;
+    private DropInterceptorSystem dropInterceptor;
 
     public ChestCollectorPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -46,20 +53,38 @@ public class ChestCollectorPlugin extends JavaPlugin {
         this.collectors = new HashMap<>();
         loadCollectors();
 
-        getCommandRegistry().registerCommand(new CollectorCommand());
+        // Initialize Auto Pickup
+        new AutoPickupManager();
+        this.dropInterceptor = new DropInterceptorSystem();
 
+        // Register commands
+        getCommandRegistry().registerCommand(new CollectorCommand());
+        getCommandRegistry().registerCommand(new AutoPickupCommand());
+
+        // Register Chest Collector systems
         getEntityStoreRegistry().registerSystem(new PlaceBlockHandler());
         getEntityStoreRegistry().registerSystem(new com.busybee.chestcollector.systems.BreakBlockHandler());
         getEntityStoreRegistry().registerSystem(new ItemCollectionSystem());
 
-        LOGGER.atInfo().log("ChestCollector enabled!");
+        // Register Auto Pickup systems
+        getEntityStoreRegistry().registerSystem(new AutoPickupListener(dropInterceptor));
+        getEntityStoreRegistry().registerSystem(dropInterceptor);
+        getEntityStoreRegistry().registerSystem(new MobDropListener(dropInterceptor));
+
+        // Register player tracking for Auto Pickup
+        getEntityStoreRegistry().registerSystem(new PlayerTrackingSystem(dropInterceptor));
+
+        LOGGER.atInfo().log("ChestCollector & Auto Pickup enabled!");
     }
 
     @Override
     protected void shutdown() {
         saveCollectors();
+        if (dropInterceptor != null) {
+            dropInterceptor.shutdown();
+        }
         Scheduler.shutdown();
-        LOGGER.atInfo().log("ChestCollector disabled!");
+        LOGGER.atInfo().log("ChestCollector & Auto Pickup disabled!");
     }
 
     public YamlConfig getConfig() {
