@@ -1,0 +1,68 @@
+$Common = "../../../Common.ui";
+
+Group {
+    LayoutMode: Left;
+    Background: #1a1a2e;
+    OutlineColor: #93844c(0.3);
+    OutlineSize: 1;
+    Padding: (Full: 16);
+    Anchor: (Bottom: 8);
+
+    Group {
+        LayoutMode: Top;
+        FlexWeight: 1;
+
+        Group {
+            LayoutMode: Left;
+            Anchor: (Bottom: 6);
+
+            Label #StatusLabel {
+                Style: (FontSize: 12, RenderBold: true, RenderUppercase: true);
+                Text: "ACTIVE";
+            }
+
+            Group { Anchor: (Width: 12); }
+
+            Label #LocationLabel {
+                Style: (FontSize: 12, TextColor: #64748b);
+                Text: "(0, 0, 0)";
+            }
+        }
+
+        Group {
+            LayoutMode: Left;
+
+            Label {
+                Style: (FontSize: 11, TextColor: #64748b);
+                Text: "Items collected:";
+            }
+
+            Group { Anchor: (Width: 6); }
+
+            Label #ItemsCollectedLabel {
+                Style: (FontSize: 11, TextColor: #22c55e, RenderBold: true);
+                Text: "0";
+            }
+
+            Group { Anchor: (Width: 16); }
+
+            Label {
+                Style: (FontSize: 11, TextColor: #64748b);
+                Text: "Radius:";
+            }
+
+            Group { Anchor: (Width: 6); }
+
+            Label #RadiusLabel {
+                Style: (FontSize: 11, TextColor: #ffaa00, RenderBold: true);
+                Text: "10";
+            }
+        }
+    }
+
+    Group { Anchor: (Width: 12); }
+
+    $Common.@SecondaryTextButton #ConfigureBtn {
+        @Text = "Configure";
+    }
+}

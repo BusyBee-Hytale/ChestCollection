@@ -1,0 +1,21 @@
+$Common = "../../../Common.ui";
+
+Group {
+    LayoutMode: Left;
+    Background: #1a1a2e;
+    OutlineColor: #93844c(0.3);
+    OutlineSize: 1;
+    Padding: (Full: 8);
+    Anchor: (Bottom: 6);
+    
+    Label #FilterText {
+        Style: (FontSize: 14, TextColor: #ffffff);
+        FlexWeight: 1;
+        Anchor: (Vertical: 0);
+    }
+    
+    $Common.@SmallSecondaryTextButton #RemoveBtn {
+        @Text = "X";
+        Anchor: (Vertical: 0);
+    }
+}

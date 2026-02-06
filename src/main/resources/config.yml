@@ -1,0 +1,38 @@
+# ========================================
+#     Chest Collector - Configuration
+# ========================================
+# Place special chest blocks that automatically collect nearby dropped items!
+# Perfect for farms, mob grinders, and keeping your world tidy.
+
+collector:
+  # Maximum number of collectors each player can place
+  # Higher values allow more collectors per player
+  # Default: 5
+  max-per-player: 5
+  
+  # Default collection radius (in blocks) for new collectors
+  # This is the initial radius when a collector is first placed
+  # Players can adjust this per-collector in the UI
+  # Default: 10
+  default-radius: 10
+  
+  # Maximum collection radius (in blocks) allowed
+  # Players cannot set their collectors above this radius
+  # Keep this reasonable to avoid performance issues
+  # Default: 32
+  max-radius: 32
+  
+  # How often (in seconds) collectors scan for and collect items
+  # Lower values = more frequent collection (but more server load)
+  # Higher values = less frequent collection (but better performance)
+  # Default: 2
+  collection-interval: 2
+  
+  # Notification type when items are collected
+  # Options:
+  #   "NOTIFICATION" - Shows in-game notification popup
+  #   "CHAT"         - Sends chat message
+  #   "TITLE"        - Shows title on screen
+  #   "NONE"         - No notification (silent collection)
+  # Default: NOTIFICATION
+  notification-type: "NOTIFICATION"

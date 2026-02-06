@@ -1,0 +1,62 @@
+$Common = "../../Common.ui";
+
+$Common.@PageOverlay {
+    LayoutMode: Center;
+    Padding: (Top: 50, Bottom: 70, Left: 20, Right: 20);
+
+    $Common.@DecoratedContainer {
+        @CloseButton = true;
+        Anchor: (Width: 600, Height: 550);
+
+        #Title {
+            $Common.@Title { @Text = "Your Collectors"; }
+        }
+
+        #Content {
+            LayoutMode: Top;
+            Padding: (Left: 12, Right: 12, Bottom: 12);
+
+            Group {
+                LayoutMode: Left;
+                Background: #12121c;
+                OutlineColor: #93844c(0.3);
+                OutlineSize: 1;
+                Padding: (Full: 12);
+                Anchor: (Bottom: 12);
+
+                Label {
+                    Style: (FontSize: 12, TextColor: #64748b);
+                    Text: "Select a collector to configure its settings";
+                    FlexWeight: 1;
+                }
+            }
+
+            Group #ScrollArea {
+                FlexWeight: 1;
+                LayoutMode: TopScrolling;
+                ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+                Group #CollectorList {
+                    LayoutMode: Top;
+                }
+            }
+
+            Group {
+                LayoutMode: Center;
+                Background: #12121c;
+                OutlineColor: #93844c(0.3);
+                OutlineSize: 1;
+                Padding: (Full: 16);
+                Anchor: (Top: 12);
+
+                Label #EmptyMessage {
+                    Style: (FontSize: 14, TextColor: #64748b);
+                    Text: "You don't have any collectors yet.";
+                    Visible: false;
+                }
+            }
+        }
+    }
+
+    $Common.@BackButton {}
+}

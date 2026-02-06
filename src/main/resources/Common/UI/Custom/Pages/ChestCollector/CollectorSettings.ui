@@ -1,0 +1,191 @@
+$Common = "../../Common.ui";
+
+$Common.@PageOverlay {
+    LayoutMode: Center;
+    Padding: (Top: 50, Bottom: 70, Left: 20, Right: 20);
+
+    $Common.@DecoratedContainer {
+        @CloseButton = true;
+        Anchor: (Width: 550, Height: 550);
+
+        #Title {
+            $Common.@Title { @Text = "Collector Settings"; }
+        }
+
+        #Content {
+            LayoutMode: Top;
+
+            Group #ScrollArea {
+                FlexWeight: 1;
+                LayoutMode: TopScrolling;
+                ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+
+                Group {
+                    LayoutMode: Top;
+
+                    Group {
+                        LayoutMode: Left;
+                        Background: #1a1a2e;
+                        OutlineColor: #93844c(0.3);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Bottom: 12);
+
+                        Label {
+                            Style: (FontSize: 14, TextColor: #93844c, RenderBold: true);
+                            Text: "Status:";
+                        }
+
+                        Group { Anchor: (Width: 8); }
+
+                        Label #StatusLabel {
+                            Style: (FontSize: 14, RenderBold: true, RenderUppercase: true);
+                            Text: "ACTIVE";
+                        }
+
+                        Label { FlexWeight: 1; }
+
+                        $Common.@SmallSecondaryTextButton #ToggleBtn {
+                            @Text = "Toggle";
+                        }
+                    }
+
+                    Group {
+                        LayoutMode: Top;
+                        Background: #1a1a2e;
+                        OutlineColor: #93844c(0.3);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Bottom: 12);
+
+                        Label {
+                            Style: (FontSize: 12, TextColor: #64748b, RenderUppercase: true);
+                            Text: "ITEMS COLLECTED";
+                            Anchor: (Bottom: 6);
+                        }
+
+                        Label #ItemsCollectedValue {
+                            Style: (FontSize: 24, TextColor: #22c55e, RenderBold: true);
+                            Text: "0";
+                        }
+                    }
+
+                    Group {
+                        LayoutMode: Top;
+                        Background: #1a1a2e;
+                        OutlineColor: #93844c(0.3);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Bottom: 12);
+
+                        Label {
+                            Style: (FontSize: 12, TextColor: #64748b, RenderUppercase: true);
+                            Text: "NOTIFICATION TYPE";
+                            Anchor: (Bottom: 8);
+                        }
+
+                        DropdownBox #NotificationTypeDropdown {
+                            Style: $Common.@DefaultDropdownBoxStyle;
+                        }
+                    }
+
+                    Group {
+                        LayoutMode: Top;
+                        Background: #1a1a2e;
+                        OutlineColor: #93844c(0.3);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Bottom: 12);
+
+                        Group {
+                            LayoutMode: Left;
+                            Anchor: (Bottom: 8);
+
+                            Label {
+                                Style: (FontSize: 12, TextColor: #64748b, RenderUppercase: true);
+                                Text: "COLLECTION RADIUS";
+                                FlexWeight: 1;
+                            }
+
+                            Label #RadiusLabel {
+                                Style: (FontSize: 14, TextColor: #ffaa00, RenderBold: true);
+                                Text: "10 blocks";
+                            }
+                        }
+
+                        Slider #RadiusSlider {
+                            Style: $Common.@DefaultSliderStyle;
+                            Min: 1;
+                            Max: 32;
+                            Value: 10;
+                        }
+                    }
+
+                    Group {
+                        LayoutMode: Top;
+                        Background: #1a1a2e;
+                        OutlineColor: #93844c(0.3);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Bottom: 12);
+
+                        Label {
+                            Style: (FontSize: 12, TextColor: #64748b, RenderUppercase: true);
+                            Text: "ITEM FILTERS";
+                            Anchor: (Bottom: 8);
+                        }
+
+                        Group {
+                            LayoutMode: Left;
+                            Anchor: (Bottom: 12);
+
+                            Group {
+                                LayoutMode: Left;
+                                FlexWeight: 1;
+
+                                $Common.@TextField #FilterInput {
+                                    FlexWeight: 1;
+                                }
+                            }
+
+                            Group { Anchor: (Width: 8); }
+
+                            $Common.@SecondaryTextButton #AddFilterBtn {
+                                @Text = "Add";
+                            }
+                        }
+
+                        Group #FilterListContainer {
+                            LayoutMode: TopScrolling;
+                            ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+                            Background: #12121c;
+                            OutlineColor: #93844c(0.2);
+                            OutlineSize: 1;
+                            Padding: (Full: 8);
+                            Anchor: (Height: 150);
+
+                            Group #FilterList {
+                                LayoutMode: Top;
+                            }
+                        }
+                    }
+
+                    Group {
+                        LayoutMode: Center;
+                        Background: #1a1a2e;
+                        OutlineColor: #ef4444(0.5);
+                        OutlineSize: 1;
+                        Padding: (Full: 16);
+                        Anchor: (Top: 12);
+
+                        $Common.@CancelTextButton #DeleteButton {
+                            @Text = "Delete Collector";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $Common.@BackButton {}
+}

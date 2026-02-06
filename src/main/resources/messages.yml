@@ -1,0 +1,41 @@
+commands:
+  collector:
+    max-limit: "You have reached the maximum collector limit (%limit%)!"
+    no-position: "Could not get your position!"
+    chest-given: "Received a collector chest! Place it to create a collector."
+    place-success: "Collector chest placed successfully!"
+    removed: "Collector chest removed!"
+    deleted: "Collector deleted successfully!"
+    toggle:
+      enabled: "ChestCollection is now Enabled"
+      disabled: "ChestCollection is now Disabled"
+    
+ui:
+  settings:
+    status:
+      active: "<color:#22c55e><bold>BUZZING WITH POWER!</bold></color>"
+      disabled: "<color:#ef4444><bold>HIBERNATING...</bold></color>"
+    filter:
+      empty-input: "Please enter a filter!"
+    labels:
+      items-collected: "Items Collected: %count%"
+      radius: "%radius% blocks"
+    notification-type:
+      label: "Notification Type"
+      options:
+        notification: "Popup"
+        title: "Title"
+        chat: "Chat"
+        none: "None"
+  list:
+    status:
+      active: "ACTIVE"
+      disabled: "DISABLED"
+      
+notifications:
+  items-collected:
+    title: "Items Collected"
+    body: "+%count% items"
+  collector-placed:
+    title: "Collector Placed!"
+    body: "Configure your settings now"
