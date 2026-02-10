@@ -2,6 +2,21 @@
   "Group": "BusyBee",
   "Name": "ChestCollector",
   "Version": "2026.2.1",
+  "Description": "Automated item collection through special collector chests",
+  "Authors": [
+    {
+      "Name": "djtmk",
+      "Email": "",
+      "Url": "discord.gg/abdm29q7af"
+    }
+  ],
+  "Website": "https://www.curseforge.com/hytale/mods/chestcollector",
+  "ServerVersion": "*",
   "Main": "com.busybee.chestcollector.ChestCollectorPlugin",
-  "IncludesAssetPack": true
+  "Dependencies": {},
+  "OptionalDependencies": {},
+  "LoadBefore": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true,
+  "SubPlugins": []
 }
