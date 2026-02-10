@@ -56,79 +56,60 @@ public class CollectorData {
     public UUID getId() {
         return id;
     }
-
     public UUID getOwnerId() {
         return ownerId;
     }
-
     public Vector3d getPosition() {
         return position;
     }
-
     public String getWorldId() {
         return worldId;
     }
-
     public void setWorldId(String worldId) {
         this.worldId = worldId;
     }
-
     public int getRadius() {
         return radius;
     }
-
     public void setRadius(int radius) {
         this.radius = radius;
     }
-
     public List<String> getItemFilters() {
         return filterItems;
     }
-
     public void setItemFilters(List<String> itemFilters) {
         this.filterItems = itemFilters;
     }
-
     public List<String> getFilterItems() {
         return filterItems;
     }
-
     public boolean isFilterEnabled() {
         return filterEnabled;
     }
-
     public void setFilterEnabled(boolean filterEnabled) {
         this.filterEnabled = filterEnabled;
     }
-
     public boolean isWhitelist() {
         return whitelist;
     }
-
     public void setWhitelist(boolean whitelist) {
         this.whitelist = whitelist;
     }
-
     public boolean isEnabled() {
         return enabled;
     }
-
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-
     public long getItemsCollected() {
         return itemsCollected;
     }
-
     public void incrementItemsCollected() {
         this.itemsCollected++;
     }
-
     public String getNotificationType() {
         return notificationType;
     }
-
     public void setNotificationType(String notificationType) {
         this.notificationType = notificationType;
     }

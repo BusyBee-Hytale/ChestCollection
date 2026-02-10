@@ -1,17 +1,12 @@
 package com.busybee.chestcollector.commands;
 
 import ai.kodari.hylib.commons.message.Messenger;
-import com.busybee.chestcollector.ChestCollectorPlugin;
-import com.busybee.chestcollector.data.CollectorData;
-import com.busybee.chestcollector.ui.pages.CollectorSettingsPage;
 import com.busybee.chestcollector.util.MessageUtil;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.command.system.AbstractCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -25,8 +20,6 @@ import org.bson.BsonBoolean;
 import org.bson.BsonDocument;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
-import java.util.UUID;
 
 public class CollectorCommand extends AbstractCommandCollection {
 

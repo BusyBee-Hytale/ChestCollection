@@ -38,7 +38,6 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
             @Nonnull BreakBlockEvent event
     ) {
         try {
-            // Don't process if event is already cancelled
             if (event.isCancelled()) return;
 
             Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
@@ -53,7 +52,6 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
             String worldId = store.getExternalData().getWorld().getName();
             if (worldId == null) return;
 
-        // Check if a collector exists at this position
         CollectorData collectorToRemove = null;
         for (CollectorData collector : ChestCollectorPlugin.getInstance().getCollectors()) {
             if (!collector.getWorldId().equals(worldId)) continue;
@@ -69,10 +67,8 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
             }
         }
 
-        // Only process if we found a collector at this position
         if (collectorToRemove == null) return;
 
-        // Verify the block being broken is actually a chest before removing the collector
         BlockType blockType = event.getBlockType();
         if (blockType == null || !blockType.getId().equals("Furniture_Crude_Chest_Small")) return;
 
@@ -86,7 +82,6 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + message);
             }
         } catch (Exception e) {
-            // Silently catch any errors to prevent interfering with other plugins
             ChestCollectorPlugin.LOGGER.atWarning().withCause(e).log("Error in BreakBlockHandler");
         }
     }

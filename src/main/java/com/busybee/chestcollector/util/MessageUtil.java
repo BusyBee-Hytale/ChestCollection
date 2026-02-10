@@ -1,8 +1,6 @@
 package com.busybee.chestcollector.util;
 
-import ai.kodari.hylib.commons.message.Messenger;
 import ai.kodari.hylib.config.YamlConfig;
-import com.busybee.chestcollector.ChestCollectorPlugin;
 
 public class MessageUtil {
 

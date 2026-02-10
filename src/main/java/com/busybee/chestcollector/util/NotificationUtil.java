@@ -33,7 +33,6 @@ public class NotificationUtil {
                 "<color:#22c55e>[Collector]</color> <white>" + bodyText
             );
             case "NONE" -> {
-                // Silent - no notification
             }
         }
     }
