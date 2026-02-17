@@ -35,6 +35,9 @@ public class ChestCollectorPlugin extends JavaPlugin {
 
     @Override
     protected void setup() {
+        super.setup();
+        new HStats("fb1502c7-e9b0-4525-bcb9-18477c3dcb16", "1.0.0");
+
         YamlConfig.init(this);
 
         this.config = new YamlConfig("config.yml");
