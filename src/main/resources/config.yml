@@ -39,3 +39,14 @@ collector:
   #   "NONE"         - No notification (silent collection)
   # Default: NOTIFICATION
   notification-type: "NOTIFICATION"
+
+# ========================================
+#          Metrics Settings
+# ========================================
+metrics:
+  # Show detailed HStats metrics logging
+  # When true: Shows every metric update message (every minute)
+  # When false: Only shows initial connection message on startup
+  # Note: Error messages are always shown regardless of this setting
+  # Default: false
+  hstats-verbose: false

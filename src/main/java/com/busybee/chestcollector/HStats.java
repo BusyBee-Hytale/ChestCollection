@@ -20,21 +20,23 @@ import java.util.concurrent.TimeUnit;
 public class HStats {
 
     private final String URL_BASE = "https://api.hstats.dev/api/";
-    private final boolean DEBUG = false; // This is for development purposes only
 
     private final String modUUID;
     private final String modVersion;
     private final String serverUUID;
+    private final boolean verboseLogging;
 
     /**
      * Initializes HStats for your mod.
      *
      * @param modUUID    The unique UUID of your mod. You can find this by creating an account on hstats.dev and registering your mod.
      * @param modVersion The current version of your mod. This is determined by you.
+     * @param verboseLogging Whether to log every metrics update (true) or only show initial connection (false)
      */
-    public HStats(String modUUID, String modVersion) {
+    public HStats(String modUUID, String modVersion, boolean verboseLogging) {
         this.modUUID = modUUID;
         this.modVersion = modVersion;
+        this.verboseLogging = verboseLogging;
 
         // Get or create the server UUID
         this.serverUUID = getServerUUID();
@@ -48,8 +50,8 @@ public class HStats {
         HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(this::logMetrics, 1, 1, TimeUnit.MINUTES);
     }
 
-    public HStats(String modUUID) {
-        this(modUUID, "Unknown");
+    public HStats(String modUUID, boolean verboseLogging) {
+        this(modUUID, "Unknown", verboseLogging);
     }
 
     private void logMetrics() {
@@ -126,13 +128,12 @@ public class HStats {
             String body = (is != null) ? new String(is.readAllBytes(), StandardCharsets.UTF_8) : "";
 
             if (code >= 200 && code < 300) {
-                System.out.println("[HStats] Successfully sent metrics (HTTP " + code + ")");
+                if (verboseLogging) {
+                    System.out.println("[HStats] Successfully sent metrics (HTTP " + code + ")");
+                }
             } else {
                 System.out.println("[HStats] Failed to send metrics (HTTP " + code + "): " + body);
             }
-
-            if (DEBUG)
-                System.out.println("Metrics POST -> " + code + " " + body);
 
             http.disconnect();
         } catch (Exception e) {

@@ -21,8 +21,8 @@ public class ChestCollectorPlugin extends JavaPlugin {
     private YamlConfig config;
     private YamlConfig messages;
     private YamlConfig collectorsData;
-
     private Map<UUID, CollectorData> collectors;
+    private Map<String, Long> breakingCollectors;
 
     public ChestCollectorPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -36,7 +36,6 @@ public class ChestCollectorPlugin extends JavaPlugin {
     @Override
     protected void setup() {
         super.setup();
-        new HStats("fb1502c7-e9b0-4525-bcb9-18477c3dcb16", "1.0.0");
 
         YamlConfig.init(this);
 
@@ -44,17 +43,19 @@ public class ChestCollectorPlugin extends JavaPlugin {
         this.messages = new YamlConfig("messages.yml");
         this.collectorsData = new YamlConfig("collectors.yml");
 
+        boolean hstatsVerbose = config.getBoolean("metrics.hstats-verbose", false);
+        new HStats("fb1502c7-e9b0-4525-bcb9-18477c3dcb16", "1.0.0", hstatsVerbose);
+
         com.busybee.chestcollector.util.MessageUtil.init();
 
         this.collectors = new HashMap<>();
+        this.breakingCollectors = new HashMap<>();
         loadCollectors();
 
-        // Register commands
         getCommandRegistry().registerCommand(new CollectorCommand());
-
-        // Register systems
         getEntityStoreRegistry().registerSystem(new PlaceBlockHandler());
         getEntityStoreRegistry().registerSystem(new com.busybee.chestcollector.systems.BreakBlockHandler());
+        getEntityStoreRegistry().registerSystem(new com.busybee.chestcollector.systems.ItemPickupHandler());
         getEntityStoreRegistry().registerSystem(new ItemCollectionSystem());
 
         LOGGER.atInfo().log("ChestCollector enabled!");
@@ -70,19 +71,15 @@ public class ChestCollectorPlugin extends JavaPlugin {
     public YamlConfig getConfig() {
         return config;
     }
-
     public YamlConfig getMessages() {
         return messages;
     }
-
     public Collection<CollectorData> getCollectors() {
         return collectors.values();
     }
-
     public Map<UUID, CollectorData> getAllCollectors() {
         return new HashMap<>(collectors);
     }
-
     public CollectorData getCollector(UUID id) {
         return collectors.get(id);
     }
@@ -124,5 +121,30 @@ public class ChestCollectorPlugin extends JavaPlugin {
         }
         collectorsData.set("collectors", collectorsList);
         collectorsData.save();
+    }
+
+    public void trackCollectorBreak(String worldId, int x, int y, int z) {
+        String key = worldId + ":" + x + ":" + y + ":" + z;
+        breakingCollectors.put(key, System.currentTimeMillis());
+        LOGGER.atInfo().log("Tracking collector break at {}", key);
+    }
+
+    public boolean isCollectorBeingBroken(String worldId, int x, int y, int z) {
+        String key = worldId + ":" + x + ":" + y + ":" + z;
+        Long timestamp = breakingCollectors.get(key);
+        if (timestamp == null) return false;
+
+        long elapsed = System.currentTimeMillis() - timestamp;
+        if (elapsed > 3000) {
+            breakingCollectors.remove(key);
+            return false;
+        }
+        return true;
+    }
+
+    public void removeCollectorBreakTracking(String worldId, int x, int y, int z) {
+        String key = worldId + ":" + x + ":" + y + ":" + z;
+        breakingCollectors.remove(key);
+        LOGGER.atInfo().log("Removed collector break tracking for {}", key);
     }
 }
