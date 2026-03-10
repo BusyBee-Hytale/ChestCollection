@@ -26,7 +26,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
     public CollectorCommand() {
         super("collector", "Manage collector chests");
-        requirePermission("chestcollector.command.help");
+        requirePermission(Permissions.HELP);
         addSubCommand((AbstractCommand) new GetSubCommand());
         addSubCommand((AbstractCommand) new SettingsSubCommand());
         addSubCommand((AbstractCommand) new ListSubCommand());
@@ -37,12 +37,12 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         GetSubCommand() {
             super("get", "Get a collector chest");
-            requirePermission("chestcollector.command.get");
+            requirePermission(Permissions.GET);
         }
 
         @Override
         public String getPermission() {
-            return "chestcollector.command.get";
+            return Permissions.GET;
         }
 
         @Override
@@ -56,7 +56,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!Permissions.hasPermission(playerRef, "chestcollector.command.get", true)) {
+            if (!Permissions.canGet(playerRef)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -92,12 +92,12 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         SettingsSubCommand() {
             super("settings", "Open collector settings");
-            requirePermission("chestcollector.command.settings");
+            requirePermission(Permissions.SETTINGS);
         }
 
         @Override
         public String getPermission() {
-            return "chestcollector.command.settings";
+            return Permissions.SETTINGS;
         }
 
         @Override
@@ -111,7 +111,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!Permissions.hasPermission(playerRef, "chestcollector.command.settings", true)) {
+            if (!Permissions.canViewSettings(playerRef)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -127,12 +127,12 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         HelpSubCommand() {
             super("help", "Show command help");
-            requirePermission("chestcollector.command.help");
+            requirePermission(Permissions.HELP);
         }
 
         @Override
         public String getPermission() {
-            return "chestcollector.command.help";
+            return Permissions.HELP;
         }
 
         @Override
@@ -146,7 +146,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!Permissions.hasPermission(playerRef, "chestcollector.command.help", true)) {
+            if (!Permissions.canViewHelp(playerRef)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -162,12 +162,12 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         ListSubCommand() {
             super("list", "List all your collectors");
-            requirePermission("chestcollector.command.settings");
+            requirePermission(Permissions.SETTINGS);
         }
 
         @Override
         public String getPermission() {
-            return "chestcollector.command.settings";
+            return Permissions.SETTINGS;
         }
 
         @Override
@@ -181,7 +181,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!Permissions.hasPermission(playerRef, "chestcollector.command.settings", true)) {
+            if (!Permissions.canViewSettings(playerRef)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }

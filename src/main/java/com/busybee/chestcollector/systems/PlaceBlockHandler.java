@@ -63,7 +63,7 @@ public class PlaceBlockHandler extends EntityEventSystem<EntityStore, PlaceBlock
         if (metadata == null || !metadata.containsKey("collector_chest")) return;
 
         Player player = store.getComponent(ref, Player.getComponentType());
-        if (player != null && !Permissions.hasPermission(playerRef, "chestcollector.place", true)) {
+        if (player != null && !Permissions.canPlace(playerRef)) {
             Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
             event.setCancelled(true);
             return;
