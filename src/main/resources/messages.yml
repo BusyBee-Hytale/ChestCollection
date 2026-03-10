@@ -1,5 +1,6 @@
 commands:
   collector:
+    no-permission: "You do not have permission to use this command!"
     max-limit: "You have reached the maximum collector limit (%limit%)!"
     no-position: "Could not get your position!"
     chest-given: "Received a collector chest! Place it to create a collector."

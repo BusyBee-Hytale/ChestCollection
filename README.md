@@ -15,6 +15,7 @@ A Hytale server plugin that adds automated item collection through special colle
 
 - `/collector get` - Get a collector chest item
 - `/collector settings` - Open the collector management UI
+- `/collector list` - List all your collectors
 - `/collector help` - Show command help
 
 ## Configuration
@@ -67,5 +68,8 @@ The plugin's behavior can be customized in `config.yml`:
 4. Reload or restart the server to apply changes
 
 ## Permissions
-
-Currently, all players have access to collector features. Permission system support may be added in future updates.
+ 
+- `chestcollector.command.get` - Access to `/collector get` command
+- `chestcollector.command.settings` - Access to `/collector settings` command
+- `chestcollector.command.help` - Access to `/collector help` command
+- `chestcollector.place` - Ability to place collector chests

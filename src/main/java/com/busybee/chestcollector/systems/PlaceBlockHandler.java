@@ -61,6 +61,13 @@ public class PlaceBlockHandler extends EntityEventSystem<EntityStore, PlaceBlock
         BsonDocument metadata = itemInHand.getMetadata();
         if (metadata == null || !metadata.containsKey("collector_chest")) return;
 
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player != null && !player.hasPermission("chestcollector.place")) {
+            Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
+            event.setCancelled(true);
+            return;
+        }
+
         YamlConfig config = ChestCollectorPlugin.getInstance().getConfig();
         int maxCollectors = config.getInt("collector.max-per-player", 5);
 
@@ -97,7 +104,6 @@ public class PlaceBlockHandler extends EntityEventSystem<EntityStore, PlaceBlock
             NotificationStyle.Success
         );
 
-        Player player = store.getComponent(ref, Player.getComponentType());
         if (player != null) {
             player.getPageManager().openCustomPage(ref, store, new CollectorSettingsPage(playerRef, collector.getId()));
         }
