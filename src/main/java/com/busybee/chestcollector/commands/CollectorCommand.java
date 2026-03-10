@@ -2,6 +2,7 @@ package com.busybee.chestcollector.commands;
 
 import ai.kodari.hylib.commons.message.Messenger;
 import com.busybee.chestcollector.util.MessageUtil;
+import com.busybee.chestcollector.util.Permissions;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
@@ -25,6 +26,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
     public CollectorCommand() {
         super("collector", "Manage collector chests");
+        requirePermission("chestcollector.command.help");
         addSubCommand((AbstractCommand) new GetSubCommand());
         addSubCommand((AbstractCommand) new SettingsSubCommand());
         addSubCommand((AbstractCommand) new ListSubCommand());
@@ -35,6 +37,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         GetSubCommand() {
             super("get", "Get a collector chest");
+            requirePermission("chestcollector.command.get");
         }
 
         @Override
@@ -53,7 +56,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!player.hasPermission("chestcollector.command.get")) {
+            if (!Permissions.hasPermission(playerRef, "chestcollector.command.get", true)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -89,6 +92,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         SettingsSubCommand() {
             super("settings", "Open collector settings");
+            requirePermission("chestcollector.command.settings");
         }
 
         @Override
@@ -107,7 +111,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!player.hasPermission("chestcollector.command.settings")) {
+            if (!Permissions.hasPermission(playerRef, "chestcollector.command.settings", true)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -123,6 +127,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         HelpSubCommand() {
             super("help", "Show command help");
+            requirePermission("chestcollector.command.help");
         }
 
         @Override
@@ -141,7 +146,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!player.hasPermission("chestcollector.command.help")) {
+            if (!Permissions.hasPermission(playerRef, "chestcollector.command.help", true)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }
@@ -157,6 +162,7 @@ public class CollectorCommand extends AbstractCommandCollection {
 
         ListSubCommand() {
             super("list", "List all your collectors");
+            requirePermission("chestcollector.command.settings");
         }
 
         @Override
@@ -175,7 +181,7 @@ public class CollectorCommand extends AbstractCommandCollection {
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null) return;
 
-            if (!player.hasPermission("chestcollector.command.settings")) {
+            if (!Permissions.hasPermission(playerRef, "chestcollector.command.settings", true)) {
                 Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
                 return;
             }

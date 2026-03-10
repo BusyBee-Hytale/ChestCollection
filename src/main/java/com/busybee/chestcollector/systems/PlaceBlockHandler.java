@@ -7,6 +7,7 @@ import com.busybee.chestcollector.ChestCollectorPlugin;
 import com.busybee.chestcollector.data.CollectorData;
 import com.busybee.chestcollector.ui.pages.CollectorSettingsPage;
 import com.busybee.chestcollector.util.MessageUtil;
+import com.busybee.chestcollector.util.Permissions;
 import com.hypixel.hytale.component.Archetype;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -62,7 +63,7 @@ public class PlaceBlockHandler extends EntityEventSystem<EntityStore, PlaceBlock
         if (metadata == null || !metadata.containsKey("collector_chest")) return;
 
         Player player = store.getComponent(ref, Player.getComponentType());
-        if (player != null && !player.hasPermission("chestcollector.place")) {
+        if (player != null && !Permissions.hasPermission(playerRef, "chestcollector.place", true)) {
             Messenger.sendMessage(playerRef, "<color:#ef4444>" + MessageUtil.get("commands.collector.no-permission"));
             event.setCancelled(true);
             return;
