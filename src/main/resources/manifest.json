@@ -14,7 +14,9 @@
   "ServerVersion": "2026.02.17-255364b8e",
   "Main": "com.busybee.chestcollector.ChestCollectorPlugin",
   "Dependencies": {},
-  "OptionalDependencies": {},
+  "OptionalDependencies": {
+    "LuckPerms:LuckPerms": "*"
+  },
   "LoadBefore": {},
   "DisabledByDefault": false,
   "IncludesAssetPack": true,
