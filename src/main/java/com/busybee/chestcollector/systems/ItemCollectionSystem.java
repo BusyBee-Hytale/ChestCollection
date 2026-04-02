@@ -20,8 +20,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
+import com.hypixel.hytale.component.Holder;
+import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -87,11 +88,13 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
         WorldChunk chunk = world.getChunkIfLoaded(chunkIndex);
         if (chunk == null) return false;
         
-        BlockState state = chunk.getState(blockX, blockY, blockZ);
-        if (!(state instanceof ItemContainerState)) return false;
+        Holder<ChunkStore> holder = chunk.getBlockComponentHolder(blockX, blockY, blockZ);
+        if (holder == null) return false;
         
-        ItemContainerState containerState = (ItemContainerState) state;
-        ItemContainer inventory = containerState.getItemContainer();
+        ItemContainerBlock containerBlock = holder.getComponent(ItemContainerBlock.getComponentType());
+        if (containerBlock == null) return false;
+        
+        ItemContainer inventory = containerBlock.getItemContainer();
         
         ItemStackTransaction transaction = inventory.addItemStack(itemStack);
         

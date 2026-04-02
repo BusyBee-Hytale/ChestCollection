@@ -33,23 +33,23 @@ ChestCollection is a powerful and lightweight Hytale plugin that introduces auto
 
 ## 📜 Commands
 
-| Command | Permission | Description |
-| :--- | :--- | :--- |
-| `/collector help` | `chestcollector.command.help` | Displays the help menu. |
-| `/collector get` | `chestcollector.command.get` | Gives you a special Collector Chest. |
+| Command               | Permission                        | Description                                  |
+|:----------------------|:----------------------------------|:---------------------------------------------|
+| `/collector help`     | `chestcollector.command.help`     | Displays the help menu.                      |
+| `/collector get`      | `chestcollector.command.get`      | Gives you a special Collector Chest.         |
 | `/collector settings` | `chestcollector.command.settings` | Opens the management UI for your collectors. |
-| `/collector list` | `chestcollector.command.settings` | Shows a list of all your placed collectors. |
+| `/collector list`     | `chestcollector.command.settings` | Shows a list of all your placed collectors.  |
 
 ---
 
 ## 🔑 Permissions
 
-| Permission Node | Default | Description |
-| :--- | :--- | :--- |
-| `chestcollector.command.help` | `Everyone` | Access to the help command. |
-| `chestcollector.command.get` | `Everyone` | Ability to obtain a collector chest. |
-| `chestcollector.command.settings` | `Everyone` | Access to the settings and list UI. |
-| `chestcollector.place` | `Everyone` | Permission to place a collector chest in the world. |
+| Permission Node                   | Default    | Description                                         |
+|:----------------------------------|:-----------|:----------------------------------------------------|
+| `chestcollector.command.help`     | `Everyone` | Access to the help command.                         |
+| `chestcollector.command.get`      | `Everyone` | Ability to obtain a collector chest.                |
+| `chestcollector.command.settings` | `Everyone` | Access to the settings and list UI.                 |
+| `chestcollector.place`            | `Everyone` | Permission to place a collector chest in the world. |
 
 ---
 
@@ -81,6 +81,3 @@ collector:
 - **Author**: djtmk (BusyBee)
 - **Discord**: [Join our community](https://discord.gg/abdm29q7af)
 - **Website**: [CurseForge Page](https://www.curseforge.com/hytale/mods/chestcollector)
-
----
-*Made with ❤️ by the BusyBee Team*
