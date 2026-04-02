@@ -1,7 +1,7 @@
 {
   "Group": "BusyBee",
   "Name": "ChestCollector",
-  "Version": "2026.3.0",
+  "Version": "2026.4.0",
   "Description": "Automated item collection through special collector chests",
   "Authors": [
     {
@@ -11,7 +11,7 @@
     }
   ],
   "Website": "https://www.curseforge.com/hytale/mods/chestcollector",
-  "ServerVersion": "2026.02.17-255364b8e",
+  "ServerVersion": "2026.03.26-89796e57b",
   "Main": "com.busybee.chestcollector.ChestCollectorPlugin",
   "Dependencies": {},
   "OptionalDependencies": {
