@@ -114,7 +114,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
         }
     }
 
-    private void saveCollectors() {
+    public void saveCollectors() {
         List<Map<String, Object>> collectorsList = new ArrayList<>();
         for (CollectorData collector : collectors.values()) {
             collectorsList.add(collector.serialize());

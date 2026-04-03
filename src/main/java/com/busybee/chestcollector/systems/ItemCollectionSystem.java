@@ -12,16 +12,15 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.DelayedEntitySystem;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
+import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
@@ -57,52 +56,55 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
             
             if (collector.isFilterEnabled()) {
                 boolean matches = collector.matchesFilter(itemStack.getItemId());
-                boolean shouldCollect = collector.isWhitelist() ? matches : !matches;
+                boolean shouldCollect = collector.isWhitelist() == matches;
                 if (!shouldCollect) continue;
             }
             
-            if (tryCollectItem(collector, itemStack, itemWorld)) {
+            PlayerRef ownerRef = Universe.get().getPlayer(collector.getOwnerId());
+            String notifType = collector.getNotificationType();
+            int quantityForNotif = itemStack.getQuantity();
+
+            if (tryCollectItem(collector, itemStack, itemWorld, ownerRef, notifType, quantityForNotif)) {
                 collector.incrementItemsCollected();
-                
+                ChestCollectorPlugin.getInstance().saveCollectors();
                 commandBuffer.removeEntity(itemRef, RemoveReason.REMOVE);
-                
-                PlayerRef ownerRef = Universe.get().getPlayer(collector.getOwnerId());
-                if (ownerRef != null && ownerRef.isValid()) {
-                    String notifType = collector.getNotificationType();
-                    NotificationUtil.sendCollectionNotification(ownerRef, itemStack.getQuantity(), notifType);
-                }
-                
                 break;
             }
         }
     }
     
-    private boolean tryCollectItem(CollectorData collector, ItemStack itemStack, World world) {
+    private boolean tryCollectItem(CollectorData collector, ItemStack itemStack, World world,
+            PlayerRef ownerRef, String notifType, int quantityForNotif) {
         Vector3d pos = collector.getPosition();
-        
+
         int blockX = (int) Math.floor(pos.x);
         int blockY = (int) Math.floor(pos.y);
         int blockZ = (int) Math.floor(pos.z);
-        
-        long chunkIndex = com.hypixel.hytale.math.util.ChunkUtil.indexChunkFromBlock(blockX, blockZ);
-        WorldChunk chunk = world.getChunkIfLoaded(chunkIndex);
-        if (chunk == null) return false;
-        
-        Holder<ChunkStore> holder = chunk.getBlockComponentHolder(blockX, blockY, blockZ);
+
+        Holder<ChunkStore> holder = world.getBlockComponentHolder(blockX, blockY, blockZ);
         if (holder == null) return false;
-        
+
         ItemContainerBlock containerBlock = holder.getComponent(ItemContainerBlock.getComponentType());
         if (containerBlock == null) return false;
-        
-        ItemContainer inventory = containerBlock.getItemContainer();
-        
+
+        SimpleItemContainer inventory = containerBlock.getItemContainer();
         ItemStackTransaction transaction = inventory.addItemStack(itemStack);
-        
+
         if (transaction.succeeded()) {
             ItemStack remainder = transaction.getRemainder();
-            return remainder == null || remainder.isEmpty();
+            if (remainder != null && !remainder.isEmpty()) return false;
+
+            // Persist the updated inventory back to the block
+            containerBlock.setItemContainer(inventory);
+            holder.replaceComponent(ItemContainerBlock.getComponentType(), containerBlock);
+
+            if (ownerRef != null && ownerRef.isValid()) {
+                NotificationUtil.sendCollectionNotification(ownerRef, quantityForNotif, notifType);
+            }
+
+            return true;
         }
-        
+
         return false;
     }
     
