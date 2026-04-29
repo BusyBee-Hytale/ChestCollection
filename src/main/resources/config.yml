@@ -13,6 +13,8 @@ database:
 
   # Connection pool settings
   pool-size: 10
+  # Show detailed database logs (SELECT/INSERT/UPDATE)
+  debug: false
 
   # MySQL / MariaDB connection details (not used for SQLite)
   mysql:
@@ -66,3 +68,4 @@ hstats:
   # When false: Only logs once on startup to confirm connection
   # When true: Logs every minute when metrics are sent successfully
   verbose-logging: false
+

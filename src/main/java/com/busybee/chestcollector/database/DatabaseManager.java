@@ -7,6 +7,8 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import com.j256.ormlite.logger.Logger;
+import com.j256.ormlite.logger.Level;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.sqlite.JDBC;
@@ -28,6 +30,10 @@ public class DatabaseManager {
 
     public boolean initialize() {
         String type = plugin.getConfig().getString("database.type", "sqlite").toLowerCase();
+
+        if (!plugin.getConfig().getBoolean("database.debug", false)) {
+            Logger.setGlobalLogLevel(Level.WARNING);
+        }
 
         try {
             HikariConfig hikariConfig = new HikariConfig();
@@ -81,6 +87,10 @@ public class DatabaseManager {
     }
 
     public void shutdown() {
+        if (!plugin.getConfig().getBoolean("database.debug", false)) {
+            Logger.setGlobalLogLevel(Level.WARNING);
+        }
+
         try {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -96,6 +106,24 @@ public class DatabaseManager {
 
     public Dao<CollectorData, String> getCollectorDao() {
         return collectorDao;
+    }
+
+    public void saveCollectorsBatch(java.util.Collection<CollectorData> collectors) {
+        if (!plugin.getConfig().getBoolean("database.debug", false)) {
+            Logger.setGlobalLogLevel(Level.WARNING);
+        }
+
+        try {
+            collectorDao.callBatchTasks(() -> {
+                for (CollectorData collector : collectors) {
+                    collector.preSave();
+                    collectorDao.createOrUpdate(collector);
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            ChestCollectorPlugin.LOGGER.atSevere().withCause(e).log("Failed to save collectors in batch");
+        }
     }
 
     public <T> CompletableFuture<T> supplyAsync(Supplier<T> supplier) {

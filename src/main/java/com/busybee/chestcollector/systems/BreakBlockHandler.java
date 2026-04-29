@@ -29,6 +29,8 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
+import org.bson.BsonBoolean;
+import org.bson.BsonDocument;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -78,30 +80,39 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
 
         if (collectorToRemove == null) return;
 
-        BlockType blockType = event.getBlockType();
-        if (blockType == null || !blockType.getId().equals("Furniture_Crude_Chest_Small")) return;
-
         PlayerRef playerRef = Universe.get().getPlayer(playerUUID);
-        if (playerRef == null) return;
-
         World world = store.getExternalData().getWorld();
-        ChestCollectorPlugin.getInstance().trackCollectorBreak(worldId, blockPos.x, blockPos.y, blockPos.z);
+
+        BlockType blockType = event.getBlockType();
+        boolean isChest = blockType != null && blockType.getId().equals("Furniture_Crude_Chest_Small");
+
+        if (!isChest) {
+            BsonDocument metadata = new BsonDocument();
+            metadata.put("collector_chest", new BsonBoolean(true));
+            ItemStack collectorStack = new ItemStack("Furniture_Crude_Chest_Small", 1, metadata);
+            spawnItemEntity(world, commandBuffer, collectorStack, blockPos);
+        } else {
+            ChestCollectorPlugin.getInstance().trackCollectorBreak(worldId, blockPos.x, blockPos.y, blockPos.z);
+        }
+
         ChestCollectorPlugin.getInstance().removeCollector(collectorToRemove);
 
         HytaleServer.SCHEDULED_EXECUTOR.schedule(() -> {
             ChestCollectorPlugin.getInstance().removeCollectorBreakTracking(worldId, blockPos.x, blockPos.y, blockPos.z);
         }, 3, TimeUnit.SECONDS);
 
-        String message = MessageUtil.get("commands.collector.removed");
-        if (message != null && !message.isEmpty()) {
-            Messenger.sendMessage(playerRef, "<color:#ef4444>" + message);
+        if (playerRef != null) {
+            String message = MessageUtil.get("commands.collector.removed");
+            if (message != null && !message.isEmpty()) {
+                Messenger.sendMessage(playerRef, "<color:#ef4444>" + message);
+            }
         }
         } catch (Exception e) {
             ChestCollectorPlugin.LOGGER.atWarning().withCause(e).log("Error in BreakBlockHandler");
         }
     }
 
-    private void spawnItemEntity(World world, Store<EntityStore> store, ItemStack itemStack, Vector3i blockPos) {
+    private void spawnItemEntity(World world, CommandBuffer<EntityStore> commandBuffer, ItemStack itemStack, Vector3i blockPos) {
         try {
             Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
 
@@ -114,7 +125,7 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
 
             holder.ensureComponent(UUIDComponent.getComponentType());
 
-            store.addEntity(holder, AddReason.SPAWN);
+            commandBuffer.addEntity(holder, AddReason.SPAWN);
         } catch (Exception e) {
             ChestCollectorPlugin.LOGGER.atWarning().withCause(e).log("Error spawning item entity");
         }

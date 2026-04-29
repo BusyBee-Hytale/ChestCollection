@@ -78,26 +78,32 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
 
         long chunkId = ChunkUtil.indexChunkFromBlock(blockX, blockZ);
 
+        if (world.getChunk(chunkId) == null) {
+            return false;
+        }
+
         Holder<ChunkStore> holder = world.getBlockComponentHolder(blockX, blockY, blockZ);
         if (holder == null) {
-            ChestCollectorPlugin.LOGGER.atInfo().log("No holder at {} {} {}", blockX, blockY, blockZ);
+            ChestCollectorPlugin.LOGGER.atWarning().log("No holder at %d %d %d - removing invalid collector", blockX, blockY, blockZ);
+            ChestCollectorPlugin.getInstance().removeCollector(collector);
             return false;
         }
 
         ItemContainerBlock containerBlock = holder.getComponent(ItemContainerBlock.getComponentType());
         if (containerBlock == null) {
-            ChestCollectorPlugin.LOGGER.atInfo().log("No container block at {} {} {}", blockX, blockY, blockZ);
+            ChestCollectorPlugin.LOGGER.atWarning().log("No container block at %d %d %d - removing invalid collector", blockX, blockY, blockZ);
+            ChestCollectorPlugin.getInstance().removeCollector(collector);
             return false;
         }
 
         SimpleItemContainer inventory = containerBlock.getItemContainer();
-        if (inventory == null || !inventory.canAddItemStack(itemStack, false, true)) {
+        if (inventory == null || !inventory.canAddItemStack(itemStack, true, true)) {
             return false;
         }
 
         String itemId = itemStack.getItemId();
         int quantity = itemStack.getQuantity();
-        BsonDocument metadata = itemStack.getMetadata();
+        final BsonDocument metadata = itemStack.getMetadata();
         java.util.UUID ownerId = collector.getOwnerId();
         String notifType = collector.getNotificationType();
 
@@ -106,20 +112,18 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
 
             WorldChunk c = world.getChunk(chunkId);
             if (c == null) {
-                ChestCollectorPlugin.LOGGER.atWarning().log("Chunk {} not found for collection at {} {} {}", chunkId, blockX, blockY, blockZ);
+                ChestCollectorPlugin.LOGGER.atWarning().log("Chunk %d not found for collection at %d %d %d", chunkId, blockX, blockY, blockZ);
                 return;
             }
 
-            // Calculate relative coordinates explicitly using the chunk index
-            long index = c.getIndex();
-            int chunkX = (int) (index >> 32);
-            int chunkZ = (int) index;
-            int relX = blockX - (chunkX << 4);
-            int relZ = blockZ - (chunkZ << 4);
+            // Use & 31 for 32x32 chunk relative coordinates
+            int relX = blockX & 31;
+            int relZ = blockZ & 31;
 
             Ref<ChunkStore> ref = BlockModule.ensureBlockEntity(c, relX, blockY, relZ);
             if (ref == null || !ref.isValid()) {
-                ChestCollectorPlugin.LOGGER.atWarning().log("Block entity ref null or invalid for {} {} {} in chunk {}", blockX, blockY, blockZ, chunkId);
+                ChestCollectorPlugin.LOGGER.atWarning().log("Block entity ref null or invalid for %d %d %d in chunk %d - removing invalid collector", blockX, blockY, blockZ, chunkId);
+                ChestCollectorPlugin.getInstance().removeCollector(collector);
                 return;
             }
 
@@ -131,14 +135,12 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
             if (inv == null) return;
 
             ItemStack transactionStack = new ItemStack(itemId, quantity, metadata);
-            
-            // Re-verify capacity inside world thread
-            if (!inv.canAddItemStack(transactionStack, false, true)) {
+
+            if (!inv.canAddItemStack(transactionStack, true, true)) {
                 return;
             }
 
-            // allOrNothing = false, filter = true, notify = true (default)
-            ItemStackTransaction transaction = inv.addItemStack(transactionStack, false, true, true);
+            ItemStackTransaction transaction = inv.addItemStack(transactionStack);
 
             if (transaction.succeeded()) {
                 cb.setItemContainer(inv);
@@ -150,7 +152,7 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
                 }
 
                 collector.incrementItemsCollected();
-                ChestCollectorPlugin.getInstance().addCollector(collector); // Save progress to DB
+                // Count updated in memory, saved periodically
 
                 if (itemRef.isValid()) {
                     entityStore.removeEntity(itemRef, RemoveReason.REMOVE);
@@ -172,3 +174,6 @@ public class ItemCollectionSystem extends DelayedEntitySystem<EntityStore> {
         return Query.and(ItemComponent.getComponentType(), TransformComponent.getComponentType());
     }
 }
+
+
+

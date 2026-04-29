@@ -14,6 +14,8 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.sql.SQLException;
+import com.hypixel.hytale.server.core.HytaleServer;
+import java.util.concurrent.TimeUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,16 +72,29 @@ public class ChestCollectorPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new com.busybee.chestcollector.systems.ItemPickupHandler());
         getEntityStoreRegistry().registerSystem(new ItemCollectionSystem());
 
+        HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(this::saveAllCollectors, 5, 5, TimeUnit.MINUTES);
         LOGGER.atInfo().log("ChestCollector enabled!");
     }
 
     @Override
     protected void shutdown() {
+        saveAllCollectorsSync();
         if (databaseManager != null) {
             databaseManager.shutdown();
         }
         Scheduler.shutdown();
         LOGGER.atInfo().log("ChestCollector disabled!");
+    }
+
+    public void saveAllCollectors() {
+        databaseManager.runAsync(this::saveAllCollectorsSync);
+    }
+
+    public void saveAllCollectorsSync() {
+        LOGGER.atInfo().log("Saving all collectors to database...");
+        if (databaseManager != null && !collectors.isEmpty()) {
+            databaseManager.saveCollectorsBatch(collectors.values());
+        }
     }
 
     public YamlConfig getConfig() {
@@ -121,7 +136,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
                 collector.postLoad();
                 collectors.put(collector.getId(), collector);
             }
-            LOGGER.atInfo().log("Loaded {} collectors from database", collectors.size());
+            LOGGER.atInfo().log("Loaded %d collectors from database", collectors.size());
         } catch (SQLException e) {
             LOGGER.atSevere().withCause(e).log("Failed to load collectors from database");
         }
@@ -147,7 +162,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
                 LOGGER.atWarning().withCause(e).log("Failed to migrate collector data");
             }
         }
-        LOGGER.atInfo().log("Migrated {} collectors to database", count);
+        LOGGER.atInfo().log("Migrated %d collectors to database", count);
         
         // Optionally clear or rename legacy file
         // collectorsData.set("collectors", new ArrayList<>());
@@ -156,7 +171,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
         LOGGER.atWarning().log("Legacy collectors.yml migration complete. You may now delete collectors.yml.");
     }
 
-    private void saveCollectorAsync(CollectorData collector) {
+    public void saveCollectorAsync(CollectorData collector) {
         databaseManager.runAsync(() -> {
             try {
                 collector.preSave();
@@ -167,7 +182,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
         });
     }
 
-    private void deleteCollectorAsync(CollectorData collector) {
+    public void deleteCollectorAsync(CollectorData collector) {
         databaseManager.runAsync(() -> {
             try {
                 databaseManager.getCollectorDao().delete(collector);
@@ -194,7 +209,6 @@ public class ChestCollectorPlugin extends JavaPlugin {
     public File getDataFolder() {
         return new File(System.getProperty("user.dir"), "mods/ChestCollector/data");
     }
-
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
@@ -202,7 +216,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
     public void trackCollectorBreak(String worldId, int x, int y, int z) {
         String key = worldId + ":" + x + ":" + y + ":" + z;
         breakingCollectors.put(key, System.currentTimeMillis());
-        LOGGER.atInfo().log("Tracking collector break at {}", key);
+        LOGGER.atInfo().log("Tracking collector break at %s", key);
     }
 
     public boolean isCollectorBeingBroken(String worldId, int x, int y, int z) {
@@ -221,6 +235,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
     public void removeCollectorBreakTracking(String worldId, int x, int y, int z) {
         String key = worldId + ":" + x + ":" + y + ":" + z;
         breakingCollectors.remove(key);
-        LOGGER.atInfo().log("Removed collector break tracking for {}", key);
+        LOGGER.atInfo().log("Removed collector break tracking for %s", key);
     }
 }
+

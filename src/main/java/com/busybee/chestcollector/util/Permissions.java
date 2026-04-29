@@ -34,31 +34,24 @@ public final class Permissions {
     public static boolean canViewHelp(PermissionHolder holder) {
         return hasPermission(holder, HELP, true);
     }
-
     public static boolean canViewHelp(PlayerRef playerRef) {
         return hasPermission(playerRef, HELP, true);
     }
-
     public static boolean canGet(PermissionHolder holder) {
         return hasPermission(holder, GET, true);
     }
-
     public static boolean canGet(PlayerRef playerRef) {
         return hasPermission(playerRef, GET, true);
     }
-
     public static boolean canViewSettings(PermissionHolder holder) {
         return hasPermission(holder, SETTINGS, true);
     }
-
     public static boolean canViewSettings(PlayerRef playerRef) {
         return hasPermission(playerRef, SETTINGS, true);
     }
-
     public static boolean canPlace(PermissionHolder holder) {
         return hasPermission(holder, PLACE, true);
     }
-
     public static boolean canPlace(PlayerRef playerRef) {
         return hasPermission(playerRef, PLACE, true);
     }

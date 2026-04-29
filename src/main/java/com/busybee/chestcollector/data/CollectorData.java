@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @DatabaseTable(tableName = "collectors")
 public class CollectorData {
@@ -60,7 +59,6 @@ public class CollectorData {
     private String notificationType;
 
     public CollectorData() {
-        // Required by ORMLite
     }
 
     public CollectorData(UUID ownerId, Vector3d position, String worldId) {
@@ -84,9 +82,6 @@ public class CollectorData {
         this.notificationType = "NOTIFICATION";
     }
 
-    /**
-     * Called after loading from database to sync fields.
-     */
     public void postLoad() {
         if (idString != null) this.id = UUID.fromString(idString);
         if (ownerIdString != null) this.ownerId = UUID.fromString(ownerIdString);
@@ -99,9 +94,6 @@ public class CollectorData {
         }
     }
 
-    /**
-     * Called before saving to database to sync fields.
-     */
     public void preSave() {
         this.idString = id.toString();
         this.ownerIdString = ownerId.toString();

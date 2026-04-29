@@ -52,7 +52,7 @@ public class ItemPickupHandler extends EntityEventSystem<EntityStore, Interactiv
             int blockZ = (int) Math.floor(position.z);
 
             if (ChestCollectorPlugin.getInstance().isCollectorBeingBroken(worldId, blockX, blockY, blockZ)) {
-                ChestCollectorPlugin.LOGGER.atInfo().log("Converting picked up chest to collector at {}, {}, {}", blockX, blockY, blockZ);
+                ChestCollectorPlugin.LOGGER.atInfo().log("Converting picked up chest to collector at %d, %d, %d", blockX, blockY, blockZ);
                 BsonDocument metadata = itemStack.getMetadata();
                 if (metadata == null) {
                     metadata = new BsonDocument();
