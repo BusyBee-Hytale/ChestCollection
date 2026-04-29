@@ -5,6 +5,24 @@
 # Perfect for farms, mob grinders, and keeping your world tidy.
 
 # ========================================
+#           Database Settings
+# ========================================
+database:
+  # Connection type: "sqlite", "mysql", or "mariadb"
+  type: "sqlite"
+
+  # Connection pool settings
+  pool-size: 10
+
+  # MySQL / MariaDB connection details (not used for SQLite)
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "chestcollector"
+    username: "root"
+    password: ""
+
+# ========================================
 #        Collector Chest Settings
 # ========================================
 collector:
@@ -39,14 +57,3 @@ collector:
   #   "NONE"         - No notification (silent collection)
   # Default: NOTIFICATION
   notification-type: "NOTIFICATION"
-
-# ========================================
-#          Metrics Settings
-# ========================================
-metrics:
-  # Show detailed HStats metrics logging
-  # When true: Shows every metric update message (every minute)
-  # When false: Only shows initial connection message on startup
-  # Note: Error messages are always shown regardless of this setting
-  # Default: false
-  hstats-verbose: false
