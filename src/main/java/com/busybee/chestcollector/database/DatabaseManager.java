@@ -39,7 +39,8 @@ public class DatabaseManager {
                 String username = plugin.getConfig().getString("database.mysql.username", "root");
                 String password = plugin.getConfig().getString("database.mysql.password", "");
 
-                hikariConfig.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&allowPublicKeyRetrieval=true");
+                String protocol = type.equals("mariadb") ? "mariadb" : "mysql";
+                hikariConfig.setJdbcUrl("jdbc:" + protocol + "://" + host + ":" + port + "/" + database + "?useSSL=false&allowPublicKeyRetrieval=true");
                 hikariConfig.setUsername(username);
                 hikariConfig.setPassword(password);
 
