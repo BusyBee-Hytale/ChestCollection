@@ -61,6 +61,9 @@ public class ChestCollectorPlugin extends JavaPlugin {
             loadCollectors();
         }
 
+        boolean verboseLogging = this.config.getBoolean("hstats.verbose-logging", false);
+        new HStats("b44725bc-666c-4f23-a9a6-0eba1c191a91", "2026.4.0", verboseLogging);
+
         getCommandRegistry().registerCommand(new CollectorCommand());
         getEntityStoreRegistry().registerSystem(new PlaceBlockHandler());
         getEntityStoreRegistry().registerSystem(new com.busybee.chestcollector.systems.BreakBlockHandler());
