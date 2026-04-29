@@ -57,3 +57,12 @@ collector:
   #   "NONE"         - No notification (silent collection)
   # Default: NOTIFICATION
   notification-type: "NOTIFICATION"
+
+# ========================================
+# HStats Metrics Settings
+# ========================================
+hstats:
+  # Show detailed logging for metrics submissions
+  # When false: Only logs once on startup to confirm connection
+  # When true: Logs every minute when metrics are sent successfully
+  verbose-logging: false
