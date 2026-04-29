@@ -1,39 +1,122 @@
 package com.busybee.chestcollector.data;
 
 import com.hypixel.hytale.math.vector.Vector3d;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@DatabaseTable(tableName = "collectors")
 public class CollectorData {
+    @DatabaseField(id = true, columnName = "id")
+    private String idString;
+
     private UUID id;
-    private final UUID ownerId;
-    private final Vector3d position;
+
+    @DatabaseField(columnName = "owner_id")
+    private String ownerIdString;
+
+    private UUID ownerId;
+
+    @DatabaseField(columnName = "world_id")
     private String worldId;
+
+    @DatabaseField(columnName = "x")
+    private double x;
+    @DatabaseField(columnName = "y")
+    private double y;
+    @DatabaseField(columnName = "z")
+    private double z;
+
+    private Vector3d position;
+
+    @DatabaseField(columnName = "radius")
     private int radius;
+
+    @DatabaseField(columnName = "filter_items")
+    private String filterItemsString;
+
     private List<String> filterItems;
+
+    @DatabaseField(columnName = "filter_enabled")
     private boolean filterEnabled;
+
+    @DatabaseField(columnName = "whitelist")
     private boolean whitelist;
+
+    @DatabaseField(columnName = "enabled")
     private boolean enabled;
+
+    @DatabaseField(columnName = "items_collected")
     private long itemsCollected;
+
+    @DatabaseField(columnName = "notification_type")
     private String notificationType;
+
+    public CollectorData() {
+        // Required by ORMLite
+    }
 
     public CollectorData(UUID ownerId, Vector3d position, String worldId) {
         this.id = UUID.randomUUID();
+        this.idString = this.id.toString();
         this.ownerId = ownerId;
+        this.ownerIdString = this.ownerId.toString();
         this.position = position;
+        this.x = position.x;
+        this.y = position.y;
+        this.z = position.z;
         this.worldId = worldId;
         this.radius = 10;
         this.filterItems = new ArrayList<>();
         this.filterItems.add("all");
+        this.updateFilterItemsString();
         this.filterEnabled = false;
         this.whitelist = true;
         this.enabled = true;
         this.itemsCollected = 0;
         this.notificationType = "NOTIFICATION";
+    }
+
+    /**
+     * Called after loading from database to sync fields.
+     */
+    public void postLoad() {
+        if (idString != null) this.id = UUID.fromString(idString);
+        if (ownerIdString != null) this.ownerId = UUID.fromString(ownerIdString);
+        this.position = new Vector3d(x, y, z);
+        if (filterItemsString != null && !filterItemsString.isEmpty()) {
+            this.filterItems = new ArrayList<>(Arrays.asList(filterItemsString.split(",")));
+        } else {
+            this.filterItems = new ArrayList<>();
+            this.filterItems.add("all");
+        }
+    }
+
+    /**
+     * Called before saving to database to sync fields.
+     */
+    public void preSave() {
+        this.idString = id.toString();
+        this.ownerIdString = ownerId.toString();
+        this.x = position.x;
+        this.y = position.y;
+        this.z = position.z;
+        this.updateFilterItemsString();
+    }
+
+    private void updateFilterItemsString() {
+        if (filterItems == null || filterItems.isEmpty()) {
+            this.filterItemsString = "all";
+        } else {
+            this.filterItemsString = String.join(",", filterItems);
+        }
     }
 
     public boolean isInRange(Vector3d itemPosition) {
@@ -72,7 +155,7 @@ public class CollectorData {
         return radius;
     }
     public void setRadius(int radius) {
-        this.radius = radius;
+        this.radius = Math.max(1, Math.min(10, radius));
     }
     public List<String> getItemFilters() {
         return filterItems;

@@ -179,7 +179,8 @@ public class CollectorSettingsPage extends InteractiveCustomUIPage<CollectorSett
         }
 
         if (data.getRadiusSlider() != null) {
-            collector.setRadius(data.getRadiusSlider().intValue());
+            int cappedRadius = Math.min(10, data.getRadiusSlider().intValue());
+            collector.setRadius(cappedRadius);
             this.updateRadiusLabel();
             return;
         }

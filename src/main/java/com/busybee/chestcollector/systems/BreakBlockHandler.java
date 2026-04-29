@@ -16,6 +16,7 @@ import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
@@ -29,6 +30,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlockEvent> {
 
@@ -86,14 +88,9 @@ public class BreakBlockHandler extends EntityEventSystem<EntityStore, BreakBlock
         ChestCollectorPlugin.getInstance().trackCollectorBreak(worldId, blockPos.x, blockPos.y, blockPos.z);
         ChestCollectorPlugin.getInstance().removeCollector(collectorToRemove);
 
-        world.execute(() -> {
-            try {
-                Thread.sleep(3000);
-                ChestCollectorPlugin.getInstance().removeCollectorBreakTracking(worldId, blockPos.x, blockPos.y, blockPos.z);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
+        HytaleServer.SCHEDULED_EXECUTOR.schedule(() -> {
+            ChestCollectorPlugin.getInstance().removeCollectorBreakTracking(worldId, blockPos.x, blockPos.y, blockPos.z);
+        }, 3, TimeUnit.SECONDS);
 
         String message = MessageUtil.get("commands.collector.removed");
         if (message != null && !message.isEmpty()) {

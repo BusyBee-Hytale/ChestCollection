@@ -4,6 +4,7 @@ import ai.kodari.hylib.commons.scheduler.Scheduler;
 import ai.kodari.hylib.config.YamlConfig;
 import com.busybee.chestcollector.commands.CollectorCommand;
 import com.busybee.chestcollector.data.CollectorData;
+import com.busybee.chestcollector.database.DatabaseManager;
 import com.busybee.chestcollector.systems.ItemCollectionSystem;
 import com.busybee.chestcollector.systems.PlaceBlockHandler;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -11,7 +12,10 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
 import javax.annotation.Nonnull;
+import java.io.File;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChestCollectorPlugin extends JavaPlugin {
 
@@ -21,6 +25,7 @@ public class ChestCollectorPlugin extends JavaPlugin {
     private YamlConfig config;
     private YamlConfig messages;
     private YamlConfig collectorsData;
+    private DatabaseManager databaseManager;
     private Map<UUID, CollectorData> collectors;
     private Map<String, Long> breakingCollectors;
 
@@ -43,14 +48,18 @@ public class ChestCollectorPlugin extends JavaPlugin {
         this.messages = new YamlConfig("messages.yml");
         this.collectorsData = new YamlConfig("collectors.yml");
 
-        boolean hstatsVerbose = config.getBoolean("metrics.hstats-verbose", false);
-        new HStats("fb1502c7-e9b0-4525-bcb9-18477c3dcb16", "1.0.0", hstatsVerbose);
-
         com.busybee.chestcollector.util.MessageUtil.init();
 
-        this.collectors = new HashMap<>();
-        this.breakingCollectors = new HashMap<>();
-        loadCollectors();
+        this.collectors = new ConcurrentHashMap<>();
+        this.breakingCollectors = new ConcurrentHashMap<>();
+
+        this.databaseManager = new DatabaseManager(this);
+        if (this.databaseManager.initialize()) {
+            loadCollectorsFromDatabase();
+            checkMigration();
+        } else {
+            loadCollectors();
+        }
 
         getCommandRegistry().registerCommand(new CollectorCommand());
         getEntityStoreRegistry().registerSystem(new PlaceBlockHandler());
@@ -63,7 +72,9 @@ public class ChestCollectorPlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
-        saveCollectors();
+        if (databaseManager != null) {
+            databaseManager.shutdown();
+        }
         Scheduler.shutdown();
         LOGGER.atInfo().log("ChestCollector disabled!");
     }
@@ -92,12 +103,75 @@ public class ChestCollectorPlugin extends JavaPlugin {
 
     public void addCollector(CollectorData collector) {
         collectors.put(collector.getId(), collector);
-        saveCollectors();
+        saveCollectorAsync(collector);
     }
 
     public void removeCollector(CollectorData collector) {
         collectors.remove(collector.getId());
-        saveCollectors();
+        deleteCollectorAsync(collector);
+    }
+
+    private void loadCollectorsFromDatabase() {
+        try {
+            List<CollectorData> fromDb = databaseManager.getCollectorDao().queryForAll();
+            for (CollectorData collector : fromDb) {
+                collector.postLoad();
+                collectors.put(collector.getId(), collector);
+            }
+            LOGGER.atInfo().log("Loaded {} collectors from database", collectors.size());
+        } catch (SQLException e) {
+            LOGGER.atSevere().withCause(e).log("Failed to load collectors from database");
+        }
+    }
+
+    private void checkMigration() {
+        if (!collectorsData.contains("collectors")) return;
+
+        List<Map<?, ?>> collectorsList = (List<Map<?, ?>>) collectorsData.get("collectors");
+        if (collectorsList == null || collectorsList.isEmpty()) return;
+
+        LOGGER.atInfo().log("Found legacy collectors.yml, starting migration...");
+        int count = 0;
+        for (Map<?, ?> map : collectorsList) {
+            try {
+                CollectorData collector = CollectorData.deserialize(map);
+                if (!collectors.containsKey(collector.getId())) {
+                    collectors.put(collector.getId(), collector);
+                    saveCollectorAsync(collector);
+                    count++;
+                }
+            } catch (Exception e) {
+                LOGGER.atWarning().withCause(e).log("Failed to migrate collector data");
+            }
+        }
+        LOGGER.atInfo().log("Migrated {} collectors to database", count);
+        
+        // Optionally clear or rename legacy file
+        // collectorsData.set("collectors", new ArrayList<>());
+        // collectorsData.save();
+
+        LOGGER.atWarning().log("Legacy collectors.yml migration complete. You may now delete collectors.yml.");
+    }
+
+    private void saveCollectorAsync(CollectorData collector) {
+        databaseManager.runAsync(() -> {
+            try {
+                collector.preSave();
+                databaseManager.getCollectorDao().createOrUpdate(collector);
+            } catch (SQLException e) {
+                LOGGER.atSevere().withCause(e).log("Failed to save collector to database");
+            }
+        });
+    }
+
+    private void deleteCollectorAsync(CollectorData collector) {
+        databaseManager.runAsync(() -> {
+            try {
+                databaseManager.getCollectorDao().delete(collector);
+            } catch (SQLException e) {
+                LOGGER.atSevere().withCause(e).log("Failed to delete collector from database");
+            }
+        });
     }
 
     private void loadCollectors() {
@@ -114,13 +188,12 @@ public class ChestCollectorPlugin extends JavaPlugin {
         }
     }
 
-    public void saveCollectors() {
-        List<Map<String, Object>> collectorsList = new ArrayList<>();
-        for (CollectorData collector : collectors.values()) {
-            collectorsList.add(collector.serialize());
-        }
-        collectorsData.set("collectors", collectorsList);
-        collectorsData.save();
+    public File getDataFolder() {
+        return new File(System.getProperty("user.dir"), "mods/ChestCollector/data");
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 
     public void trackCollectorBreak(String worldId, int x, int y, int z) {
